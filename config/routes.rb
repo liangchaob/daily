@@ -3,6 +3,12 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'admin/users#index'  
 
+  resources :landingpage do
+    collection do
+      get :demo
+    end
+  end
+
   # 管理员路由
   namespace :admin do
     resources :users do
@@ -11,6 +17,7 @@ Rails.application.routes.draw do
       end
     end
     resources :teams
+    resources :projects
   end
   
 

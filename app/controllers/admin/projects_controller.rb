@@ -1,5 +1,7 @@
 class Admin::ProjectsController < ApplicationController
   layout 'admin'
+  # 需要管理员权限
+  before_action :require_is_admin
 
   def index
     @projects = Project.all
@@ -16,12 +18,9 @@ class Admin::ProjectsController < ApplicationController
     @members = @project.members
   end
 
-
-
   def new
     @project = Project.new
   end
-
 
   def create
     @project = Project.new(project_params)
@@ -72,8 +71,6 @@ class Admin::ProjectsController < ApplicationController
         render :edit
       end
     end
-
-
   end
 
   def destroy
@@ -89,11 +86,5 @@ class Admin::ProjectsController < ApplicationController
   def project_params
     params.require(:project).permit(:name, :description,:new_member,:new_manager)
   end
-  
-
-
-
-
-
 
 end

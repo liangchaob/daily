@@ -1,6 +1,7 @@
 class Admin::UsersController < ApplicationController
-
   layout 'admin'
+  # 需要管理员权限
+  before_action :require_is_admin
 
   def index
     @users = User.all
@@ -62,21 +63,35 @@ class Admin::UsersController < ApplicationController
   def reset_password
     @user = User.find(params[:id])
     @user.password = ENV["user_default_password"]
+    @user.password_resetting = true
     if @user.save
       flash[:notice] = "用户密码重置成功!"
-      render :show
+      redirect_to admin_user_path(@user)
     else
       flash[:alert] = "用户密码重置失败!"
-      render :show
+      redirect_to admin_user_path(@user)
     end
   end
 
+  # 设置为管理员
+  def set_admin
+    @user = User.find(params[:id])
+    @user.set_admin!
+    redirect_to admin_users_path
+  end
 
+
+  # 取消管理员
+  def cancel_admin
+    @user = User.find(params[:id])
+    @user.cancel_admin!
+    redirect_to admin_users_path
+  end
 
   private
 
   def user_params
-    params.require(:user).permit(:name,:code,:email,:password_resetting,:team_id)
+    params.require(:user).permit(:name,:code,:email,:avatar_attachment,:password_resetting,:team_id)
   end
   
 

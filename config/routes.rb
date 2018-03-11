@@ -1,25 +1,33 @@
 Rails.application.routes.draw do
   devise_for :users
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  root 'admin/users#index'  
+  root 'workflows#current_week'  
 
-  resources :landingpage do
-    collection do
-      get :demo
-    end
-  end
+  resources :workflows
+
 
   # 管理员路由
   namespace :admin do
     resources :users do
       member do
         post :reset_password
+        post :set_admin
+        post :cancel_admin
       end
     end
     resources :teams
     resources :projects
   end
   
+
+
+  # demo测试页面
+  resources :landingpage do
+    collection do
+      get :demo
+    end
+  end
+
 
 
   # api
@@ -32,6 +40,12 @@ Rails.application.routes.draw do
       get "/teams/:search"  => "teams#search", as: :teams
     end
   end
+
+
+  # 头像动态生成
+  get "avatar/:size/:background/:text" => Dragonfly.app.endpoint { |params, app|
+    app.generate(:initial_avatar, URI.unescape(params[:text]), { size: params[:size], background_color: params[:background] })
+  }, as: :avatar
 
 
 end

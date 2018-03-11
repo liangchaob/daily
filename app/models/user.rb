@@ -1,4 +1,8 @@
 class User < ApplicationRecord
+  # 扩展 Dragonfly 头像模块
+  extend Dragonfly::Model
+  include Avatarable
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -12,6 +16,9 @@ class User < ApplicationRecord
   validates :name, presence: true
 
 
+  # 挂载头像
+  mount_uploader :avatar_attachment, AvatarAttachmentUploader
+
   # 团队关系
   # 一个用户只隶属于同一个团队
   belongs_to :team, optional: true
@@ -19,9 +26,6 @@ class User < ApplicationRecord
   # n:m 管理团队
   has_many :teammanager_relationships
   has_many :manager_teams, through: :teammanager_relationships, source: :team
-
-
-
 
   # 项目管理
   # 1:n 创建项目
@@ -37,17 +41,41 @@ class User < ApplicationRecord
   has_many :projectmanager_relationships
   has_many :manage_projects, through: :projectmanager_relationships, source: :project
 
-
-
-
-
-  # 搜索常规项目
+  # 搜索用户
   def self.search(search)
     if search
       where('name LIKE ? or code LIKE ?',"%#{search}%","%#{search}%")
     else
       scoped
     end
+  end
+
+  # 全名
+  def name_pinyin
+    Pinyin.t(self.name)
+  end
+
+  # 头像字符
+  def avatar_text
+    name_pinyin.chr
+  end
+
+
+  # 判断是否是管理员
+  def is_admin?
+    self.is_admin
+  end
+
+  # 设置为管理员
+  def set_admin!
+    self.is_admin = true
+    self.save
+  end
+
+  # 取消管理员
+  def cancel_admin!
+    self.is_admin = false
+    self.save
   end
 
 end
@@ -75,7 +103,9 @@ end
 #  phone                  :string
 #  description            :text
 #  team_id                :integer
+#  is_admin               :boolean          default(FALSE)
 #  password_resetting     :boolean          default(TRUE)
+#  avatar_attachment      :string
 #
 # Indexes
 #

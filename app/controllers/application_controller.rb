@@ -1,6 +1,5 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-
   # 强制登录重定向
   before_action :authenticate_user! 
 
@@ -24,6 +23,13 @@ class ApplicationController < ActionController::Base
       flash[:alert] = '您不是管理员'
       redirect_to root_path
     end
+  end
+
+
+
+  # 发送信息
+  def feed_create!(feedable)
+    Feed.create(feedable_id: feedable.id, feedable_type: feedable.class)
   end
 
 

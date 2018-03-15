@@ -7,3 +7,5 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 User.create(name: '梁超',email: 'liangchaob@dcits.com',code: 'liangchaob',is_admin: true,password: 'P@ssw0rd',password_resetting: false)
+
+Project.create(name: '第一个项目')
